@@ -1,5 +1,5 @@
 
-class Player():
+class Player:
 
     def __init__(self, name, role):
         self.name
@@ -12,6 +12,17 @@ class Player():
             self.health += 1
 
 
+
+    def death(self, deck):
+        pass #do deck.discard() for all cards in hand, judgement, equipment
+
+    def draw(self, n, deck):
+        drawncards = deck.draw(n)
+        hand += drawncards
+
+    def damaged(self, n):
+        self.health -= n
+
     def beforeplayphase(self, deck):
         pass #for stuff like examining top of deck, etc
 
@@ -23,8 +34,7 @@ class Player():
             pass
 
     def drawphase(self, deck):
-        drawncards = deck.draw(2)
-        hand += drawncards
+        self.draw(2, deck)
 
     def actionphase(self, deck):
         if len(hand) == 0:
@@ -55,9 +65,6 @@ class Player():
 
     def afterplayphase(self, deck):
         pass #for stuff like drawing after turn
-
-    def death(self, deck):
-        pass #do deck.discard() for all cards in hand, judgement, equipment
 
 
 #use inheritance to do all the characters and modify each phase 

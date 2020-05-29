@@ -2,7 +2,7 @@ import LTK_deck
 import LTK_player
 
 
-class board():
+class board:
     def __init__(self, n_players):
         # for number of players, get player names somehow
         self.table = self.assignPositionsandRoles(playernames)
@@ -45,29 +45,31 @@ class board():
 
 
     def turn(self, player):
-        player.beforeplay(deck)
-        player.judgment(deck)
-        player.draw(deck)
+        player.beforeplayphase(deck)
+        player.judgmentphase(deck)
+        player.drawphase(deck)
         while True: 
-            output = player.action(deck)
+            output = player.actionphase(deck)
             if output == False:
                 break
             else:
                 pass
-                # Resolve play based on card, target, etc.  If equipment or lightning, just report it 
-        player.discard(deck)
-        player.afterplay(deck)
+                # Resolve play based on card, target.  If equipment or lightning, just report it 
+        player.discardphase(deck)
+        player.afterplayphase(deck)
 
 
 
 
-    def checkDistance(attacker, defender, type):
-        if type == "Snatch":
-            pass
-        elif type == "Rations":
-            pass
-        else:
-            pass
+    def checkDistance(self, attacker, defender, card):
+
+        
+        #distance = min([abs(attacker position - defender postion), abs((attacker potion + len(self.table)) - defender position), abs(attacker position - (defender position + len(self.table)))])
+        #modify by horses
+        if card == "Strike":
+            pass # modify by weapons too
+
+        return distance
 
 
 
@@ -89,3 +91,11 @@ class board():
 
 
 
+    def Strike(self, attacker, defender):
+        checkDistance(attacker, defender, "Strike")
+        #check armor of defender
+        #ask defender to play dodge or take hit
+        #if struck, do defender.damage(n)
+        pass
+    
+  
