@@ -11,9 +11,6 @@ class Deck():
     def shuffle(self):
         pass
 
-    def deal(self, players):
-        pass
-
     def draw(self, n):
         pass
         #remove n cards from deck and return them
