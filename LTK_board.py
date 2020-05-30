@@ -63,11 +63,11 @@ class board:
 
     def checkDistance(self, attacker, defender, card):
 
-        
-        #distance = min([abs(attacker position - defender postion), abs((attacker potion + len(self.table)) - defender position), abs(attacker position - (defender position + len(self.table)))])
+        #distance = min(abs(attacker position - defender postion), abs((attacker potion + len(self.table)) - defender position), abs(attacker position - (defender position + len(self.table))))
         #modify by horses
         if card == "Strike":
-            pass # modify by weapons too
+            # modify by weapons
+            pass
 
         return distance
 
@@ -91,6 +91,15 @@ class board:
 
 
 
+
+
+
+    ##################################################################################################################################################
+    #
+    # Stuff to play on your turn that affects other players (stuff that doesn't affect others will be dealt with in by player functions)
+    #
+    ##################################################################################################################################################
+
     def Strike(self, attacker, defender):
         checkDistance(attacker, defender, "Strike")
         #check armor of defender
@@ -98,4 +107,35 @@ class board:
         #if struck, do defender.damage(n)
         pass
     
-  
+    ####### Scrolls
+
+    def Dismantle(self, attacker, defender):
+        pass
+
+    def BorrowedSword(self, attacker, puppet, defender):
+        pass
+
+    def Snatch(self, attacker, defender):
+        checkDistance(attacker, defender, "Snatch")
+        pass
+
+    def Duel(self, attacker, defender):
+        pass
+
+    def Contentment(self, attacker, defender):
+        pass
+
+    ######## AOE Scrolls
+
+    def Barbarians(self, attacker):
+        pass
+
+    def ArrowBarrage(self, attacker):
+        pass
+
+    def PeachGarden(self, attacker):
+        pass
+
+    def BountifulHarvest(self, attacker):
+        pass
+
