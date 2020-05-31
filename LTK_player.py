@@ -22,15 +22,23 @@ class Player:
         drawncards = deck.draw(n)
         hand += drawncards
 
-    def discard(self, card = None):
+    def discard(self, card = None, count = 1):
         if card == None:
-            # have player choose card
-        #remove card from hand or equipment depending
+            # have player choose {count} cards to discard
+            pass
+        #remove card(s) from hand or equipment depending
         deck.discard(card)
 
 
     def damaged(self, n):
         self.health -= n
+
+    def heal(self, n):
+        if self.health < self.maxhealth:
+            self.health += n
+            return True
+        else: 
+            return False
 
 
     ##########################################################################
@@ -61,33 +69,34 @@ class Player:
             else:
                 #play card
                 #remember to to self.discard(card) with cards that should be in the discard pile 
-                if equipment:
+                if card == equipment:
                     # Add to equipment section: replace equipment (do self.discard(card)) and put new equipment there
                     return True
-                elif lightning:
-                    # Add to judgement section
+                elif card == lightning:
+                    # Add to judgement section, remove from hand
                     return True
-                elif peach:
-                    if self.health < self.maxhealth:
-                        self.health += 1
-                    # Add 1 to health, do self.discard(card) 
+                elif card == peach:
+                    self.heal(1)
+                    self.discard(card) 
                     return True
-                elif somethingfornothing:
+                elif card == somethingfornothing:
                     self.draw(2, deck)
+                    self.discard(card)
                     return True
-                elif aoe:
-                    # Do self.discard(card)
+                elif card == aoe:
+                    self.discard(card)
                     return [card, "all"]
-                elif ligtning:
-                    # Add to judgment section
-                    return True
+                elif card == contentment:
+                    # remove from hand, don't discard!  
+                    return [card, target]
                 else:
                     # Have player choose target, do self.discard(card)
                     return [card, target]
 
     def discardphase(self, deck):
-        pass
-        #remember to do self.discard(card) with cards that should be in the discard pile and remove them from hard
+        if len(self.hand) > self.health:
+            self.discard(count = len(self.hand) - self.health)
+        
 
     def afterplayphase(self, deck):
         pass #for stuff like drawing after turn
