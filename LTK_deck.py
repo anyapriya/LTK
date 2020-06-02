@@ -6,26 +6,26 @@ class Deck:
 
     def __init__(self):
         self.deck = [i for i in cards]
-        self.discard = []
+        self.discardpile = []
         self.shuffle()
 
     def shuffle(self):
-        self.deck += self.discard
+        self.deck += self.discardpile
         random.shuffle(self.deck)
-        self.discard = []
+        self.discardpile = []
 
     def draw(self, n):
         drawn = []
-        for i in n:
+        for i in range(n):
             drawn += [self.deck.pop(0)]
         return drawn
 
 
     def discard(self, cards):
         if type(cards) is list:
-            self.discard += cards
+            self.discardpile += cards
         else:
-            self.discard += [cards] #can get rid of this if we're always careful about inputting a list of even just one item 
+            self.discardpile += [cards] #can get rid of this if we're always careful about inputting a list of even just one item 
         
 
 
