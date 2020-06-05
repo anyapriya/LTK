@@ -1,6 +1,7 @@
 import random
+import logging
 
-
+log = logging.getLogger('default')
 
 class Deck:
 

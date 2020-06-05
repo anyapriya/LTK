@@ -1,3 +1,8 @@
+import logging
+
+
+log = logging.getLogger('default')
+
 
 class Player:
 
