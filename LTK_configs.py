@@ -32,7 +32,6 @@ logging_config = {
             'interval': 1,
             'backupCount': 5
         },
-        #can make a queue handler and queue listener here if we do multiprocessing
     },
 
 
