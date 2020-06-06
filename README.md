@@ -33,13 +33,13 @@ This is a tentative plan for getting the game up and running, but everything is 
 -------------------------------
 
 ## II. Logging and Testing 
-#### A. Set up initial logging
-#### B. Set up initial tests
-- set up basic framework for making the tests and write unit tests for what we have
-- will need to keep adding more tests as we go 
-#### C. Set up automated testing / workflow
+#### <s>A. Set up initial logging </s>
+#### <s>B. Set up initial tests </s>
+#### C. Add in testing / logging for everything we have so far 
+- Make sure to keep adding tests / logs for additional stuff we write!
+#### D. Set up automated testing / workflow
 - Jenkins?
-#### D. Error reporting
+#### E. Error reporting
 - If this is being run on other people's computers, will eventually need a method to do optional error reporting (ask for permission) by sending logs back to the server if something goes wrong
 
 -------------------------------
