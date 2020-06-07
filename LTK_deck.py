@@ -1,21 +1,24 @@
 import random
+import logging
 
-
+log = logging.getLogger('default')
 
 class Deck:
 
     def __init__(self):
-        self.deck = [i for i in cards]
-        self.discardpile = []
+        self.deck = []
+        self.discardpile = [i for i in cards]
         self.shuffle()
 
     def shuffle(self):
+        random.shuffle(self.discardpile)
         self.deck += self.discardpile
-        random.shuffle(self.deck)
         self.discardpile = []
 
     def draw(self, n):
         drawn = []
+        if n > len(self.deck):
+            self.shuffle()
         for i in range(n):
             drawn += [self.deck.pop(0)]
         return drawn

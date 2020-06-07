@@ -1,7 +1,9 @@
 import LTK_deck 
 import LTK_player
 import random
+import logging
 
+log = logging.getLogger('default')
 
 class board:
     def __init__(self, n_players):
@@ -31,6 +33,8 @@ class board:
                 self.table[i] = [names.pop(random.randrange(0,len(names))), "Monarch"]
             else:
                 self.table[i] = [names.pop(random.randrange(0,len(names))), roles.pop(random.randrange(0,len(roles)))]
+
+        log.info("Assigned positions and rolls")
             
         
 

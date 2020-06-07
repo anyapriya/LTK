@@ -1,9 +1,10 @@
 import LTK_board
 from LTK_Exceptions import PlayerCountOutOfBounds
+import LTK_configs
+import logging
 
 
-
-
+log = logging.getLogger('default')
 
 def getPlayers():
     players = input("Please enter how many players (4-10): ")
@@ -24,7 +25,9 @@ def getPlayers():
 
 if __name__ == "__main__":
     
+    log.info("Getting player counts")
     players = getPlayers()
+    log.info("Initializing board")
     board = LTK_board.board(players)
     # board.play()
 
