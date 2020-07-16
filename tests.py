@@ -22,8 +22,86 @@ class test_main(unittest.TestCase):
 class test_board(unittest.TestCase):
     pass #TODO
 
+
 class test_player(unittest.TestCase):
-    pass #TODO
+    def test_draw(self):
+        pass #TODO
+
+    def test_judgementdraw(self):
+        pass #TODO
+
+    def test_discard(self):
+        deck = Deck()
+        player = Player("Bumi", "Monarch")
+        player.draw(deck, 8)
+
+        discardedcard = player.hand[2]
+        self.assertNotIn(discardedcard, deck.deck)
+        self.assertNotIn(discardedcard, deck.discardpile)
+        self.assertIn(discardedcard, player.hand)
+
+        player.discard(deck, cards = [discardedcard])
+
+        self.assertNotIn(discardedcard, deck.deck)
+        self.assertIn(discardedcard, deck.discardpile)
+        self.assertNotIn(discardedcard, player.hand)
+
+
+
+
+        discardedcards = player.hand[1:4]
+
+        for discardedcard in discardedcards:
+            self.assertNotIn(discardedcard, deck.deck)
+            self.assertNotIn(discardedcard, deck.discardpile)
+            self.assertIn(discardedcard, player.hand)
+
+        player.discard(deck, cards = discardedcards)
+
+        for discardedcard in discardedcards:
+            self.assertNotIn(discardedcard, deck.deck)
+            self.assertIn(discardedcard, deck.discardpile)
+            self.assertNotIn(discardedcard, player.hand)
+
+
+
+
+        handsize = len(player.hand)
+        discardpilesize = len(deck.discardpile)
+        player.discard(deck, count = 3)
+        self.assertEqual(handsize - 3, len(player.hand))
+        self.assertEqual(discardpilesize + 3, len(deck.discardpile))
+
+
+    def test_damaged(self):
+        pass #TODO
+
+    def test_heal(self):
+        pass #TODO
+
+    def test_death(self):
+        pass #TODO
+
+    def test_beforeplayphase(self):
+        pass #TODO
+
+    def test_judgementphast(self):
+        pass #TODO
+
+    def test_drawphase(self):
+        pass #TODO
+
+    def test_actionphase(self):
+        pass #TODO
+    
+    def test_discardphase(self):
+        pass #TODO
+
+    def test_afterplayphase(self):
+        pass #TODO
+
+
+
 
 class test_deck(unittest.TestCase):
     
