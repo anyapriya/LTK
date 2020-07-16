@@ -6,6 +6,15 @@ import logging
 log = logging.getLogger('default')
 
 class board:
+
+    ##################################################################################################################################################
+    #
+    # Initialization functions
+    #
+    ##################################################################################################################################################
+
+
+
     def __init__(self, n_players):
         self.table = {}
         self.assignPositionsandRoles(n_players)
@@ -13,8 +22,8 @@ class board:
         self.deck = LTK_deck.Deck()
         self.deal()
         self.playerturn = 0
-        self.gameover = False
-
+        self.rounds = 0
+        self.winner = None
 
 
 
@@ -50,33 +59,68 @@ class board:
 
     def deal(self):
         for p in self.table.values():
-            p.draw(4, self.deck)
+            p.draw(self.deck, 4)
 
 
-    # def play(self):
-    #     # basic rules for going around in order and having each character play 
+    ##################################################################################################################################################
+    #
+    # Gameplay
+    #
+    ##################################################################################################################################################
+
+
+
+    def play(self):
+        # basic rules for going around in order and having each character play 
         
-    #     while not gameover():
-    #         self.turn(self.table[self.playerturn])
-    #         self.playerturn = (self.playerturn + 1) % len(self.table)
+        while not self.winner: 
 
-    #     # say who won game
+            if self.playerturn == 0:
+                self.rounds += 1 #everytime it's the monarch's turn, it counts as a new round 
+
+            self.turn(self.playerturn) 
+
+            self.playerturn = (self.playerturn + 1) % len(self.table) # just an update for who goes next 
+
+            if self.rounds > 5:  #safety for now, remove later
+                log.info("Reached over 5 rounds, we're quitting the game") 
+                self.winner = "No one"
+
+        log.info("The winner was: " + self.winner)
 
 
 
-    # def turn(self, player):
-    #     player.beforeplayphase(deck)
-    #     player.judgmentphase(deck)
-    #     player.drawphase(deck)
-    #     while True: 
-    #         output = player.actionphase(deck)
-    #         if output == False:
-    #             break
-    #         else:
-    #             pass
-    #             # Resolve play based on card, target.  If equipment or lightning, just report it 
-    #     player.discardphase(deck)
-    #     player.afterplayphase(deck)
+    def turn(self, playerposition):
+        player = self.table[playerposition]
+
+        player.beforeplayphase(self.deck)
+
+        skipPlay = False
+        while True: 
+            output = player.judgmentphase(self.deck) #does nothing for now since no judgements in the deck yet, but it's coded
+            if output["Type"] == "Lightning":
+                if output["Result"] == -1:
+                    self.checkDeath(playerposition, playerposition)
+                else:
+                    self.table[(self.playerturn + 1) % len(self.table)].judgement += output["Result"] #Put the card in the next person's judgement pile
+            elif output["Type"] == "Contentment" and output["Result"] == -1:
+                skipPlay = True
+            else:
+                break
+
+        player.drawphase(self.deck)
+
+        while not skipPlay: 
+            output = player.actionphase(self.deck) #action phase returns False for now so doesn't do anything
+            if output == False:
+                break
+            else:
+                pass
+                # TODO: Resolve play based on card, target.  If equipment or lightning, just report it 
+
+
+        player.discardphase(self.deck)
+        player.afterplayphase(self.deck)
 
 
 
@@ -93,22 +137,69 @@ class board:
 
 
 
-    # def gameover(self):
-    #     pass
-    #     # check if game over based on roles left, if it is then set self.gameover = True
+    def isGameOver(self):
+        stillMonarch = False
+        stillRebel = False
+        stillTurncoat = False
+        for i in self.table:
+            if stillMonarch and (stillRebel or stillTurncoat):
+                return False
+            if i.role == "Monarch":
+                stillMonarch = True
+            if i.role == "Rebel":
+                stillRebel = True
+            if i.role == "Turncoat":
+                stillTurncoat = True
+        if stillMonarch:
+            self.winner = "Team Monarch"
+        elif stillRebel:
+            self.winner = "Team Rebel"
+        else:
+            self.winner = "The Lone Turncoat"
+
+        
+        
+
+
+    
+    def checkDeath(self, playerposition, damagesourceposition):
+        player = self.table[playerposition]
+
+        if player.health > 0:
+            return False
+        else:
+            peachorder = [i if i < len(self.table) else i % len(self.table) for i in range(damagesourceposition, damagesourceposition + len(self.table))]
+            for i in peachorder:
+                wanttogivepeaches = True
+                while wanttogivepeaches & player.health < 1:
+                    #ask player i for peaches
+                    #if they give a peach:
+                    #    discard peach
+                    #    heal player
+                    #else:
+                    #    wanttogivepeaches = False
+                    pass
+                if player.health > 0:
+                    return False
+                
+            # because of the return False above, if it gets here, the player is dead
+            player.loseEverything(self.deck)
+            if damagesourceposition != self.playerturn:
+                if player.role == "Rebel":
+                    self.table[damagesourceposition].draw(3)
+                if player.role == "Minister" and self.table[damagesourceposition].role == "Monarch":
+                    self.table[0].loseEverything(self.deck)
+                    
+            for i in range(playerposition, len(self.table) - 1):
+                self.table[i] = self.table[i + 1]
+            del(self.table[len(self.table) - 1]) #do we want some record of who's dead?  This doesn't seem the best method but it's a good temporary solution for making the game work
+            if playerposition < self.playerturn:
+                self.playerturn -= 1
+            
+            self.isGameOver()
 
 
 
-    # def death(self, player, damagesource):
-    #     pass
-    #     # check for peaches
-    #     # if dead:
-    #     #     call player.death() 
-    #     #     resolve additional stuff based on player.role (i.e. give cards to damage source if rebel)
-    #     #     remove them from the table and move everyone after them up one position (i.e. if player at position 6 dies, move player 7 at position 7 to position 6)
-    #     #     if position of player < self.playerturn: 
-    #     #         self.playerturn += 1
-    #     #     self.gameover() to check if the games over
 
 
 

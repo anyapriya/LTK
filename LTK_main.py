@@ -16,8 +16,10 @@ def getPlayers():
                 raise PlayerCountOutOfBounds
             break
         except ValueError:
+            log.debug("ValueError on player input (couldn't be parsed into an int): {inp}".format(inp = players))
             players = input("Did not enter a number.  Please input a number between 4 and 10 and hit enter: ")
         except PlayerCountOutOfBounds:
+            log.debug("Too low or too high number on player input: {inp}".format(inp = players))
             players = input("Number was not an allowed number of players.  Please input a number between 4 and 10 and hit enter: ")
     return players
 
@@ -27,8 +29,8 @@ if __name__ == "__main__":
     
     log.info("Getting player counts")
     players = getPlayers()
-    log.info("Initializing board")
+    log.info("Initializing board with {n} players".format(n = players))
     board = LTK_board.board(players)
-    # board.play()
+    board.play()
 
 
