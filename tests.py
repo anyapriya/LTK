@@ -32,22 +32,19 @@ class test_player(unittest.TestCase):
 
     def test_discard(self):
         deck = Deck()
-        player = Player("Bumi", "Monarch")
-        player.draw(deck, 8)
+        player = Player("Bumi", "Monarch", 0, deck, None)
+        player.draw(8)
 
         discardedcard = player.hand[2]
         self.assertNotIn(discardedcard, deck.deck)
         self.assertNotIn(discardedcard, deck.discardpile)
         self.assertIn(discardedcard, player.hand)
 
-        player.discard(deck, cards = [discardedcard])
+        player.discard(cards = [discardedcard])
 
         self.assertNotIn(discardedcard, deck.deck)
         self.assertIn(discardedcard, deck.discardpile)
         self.assertNotIn(discardedcard, player.hand)
-
-
-
 
         discardedcards = player.hand[1:4]
 
@@ -56,7 +53,7 @@ class test_player(unittest.TestCase):
             self.assertNotIn(discardedcard, deck.discardpile)
             self.assertIn(discardedcard, player.hand)
 
-        player.discard(deck, cards = discardedcards)
+        player.discard(cards = discardedcards)
 
         for discardedcard in discardedcards:
             self.assertNotIn(discardedcard, deck.deck)
@@ -64,22 +61,49 @@ class test_player(unittest.TestCase):
             self.assertNotIn(discardedcard, player.hand)
 
 
-
-
         handsize = len(player.hand)
         discardpilesize = len(deck.discardpile)
-        player.discard(deck, count = 3)
+        player.discard(count = 3)
         self.assertEqual(handsize - 3, len(player.hand))
         self.assertEqual(discardpilesize + 3, len(deck.discardpile))
 
 
-    def test_damaged(self):
+    def test_damaged_and_heal(self):
+        deck = Deck()
+        player = Player("Zuko", "Monarch", 0, deck, None)
+        startinghealth = player.health
+
+        player.damaged(2)
+        self.assertEqual(startinghealth - 2, player.health)
+
+        player.heal(1)
+        self.assertEqual(startinghealth - 1, player.health)
+
+        player.damaged(8)
+        self.assertEqual(startinghealth - 9, player.health) #health can go negative
+
+        player.heal(10)
+        self.assertEqual(player.health, player.maxhealth) #shouldn't go over max health
+        
+
+    def test_loseEverything(self):
+        deck = Deck()
+        player = Player("Ozai", "Monarch", 0, deck, None)
+        player.draw(4)
+        #TODO: put something in player's equipement pile once we have equipment cards coded in
+
+        self.assertNotEqual(player.hand, [])
+        # self.assertNotEqual(player.equipment, {"Off_horse": None, "Def_horse": None, "Armor": None, "Weapon": None})
+
+        player.loseEverything()
+
+        self.assertEqual(player.hand, [])
+        self.assertEqual(player.equipment, {"Off_horse": None, "Def_horse": None, "Armor": None, "Weapon": None})
+
+    def test_strike(self):
         pass #TODO
 
-    def test_heal(self):
-        pass #TODO
-
-    def test_death(self):
+    def test_dodge(self):
         pass #TODO
 
     def test_beforeplayphase(self):

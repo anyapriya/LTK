@@ -13,9 +13,13 @@ This is a tentative plan for getting the game up and running, but everything is 
 
 #### <s>B. Get something working </s>
 
-#### C. Add in turns 
-- no characters or equipment yet, and a few cards hardcoded in
-- maybe first choose 3 cards like strike, dodge, peach and get game working for those
+#### <s>C. Add in turns </s>
+- no characters or equipment yet, only hand cards are strike, dodge, peach
+- has players randomly choose how to play (chance of ending turn or playing any given card in their hand given hand size n is $\frac{1}{n+1}$ )
+- if a player uses a strike, they strike the next person
+- if a player is attacked and has a dodge, they dodge
+- continues for 5 turns
+
 
 
 #### D. Add in non-equipment cards one at a time and make sure they each work (and write unit tests for each as well go) - this should be easy to divide up

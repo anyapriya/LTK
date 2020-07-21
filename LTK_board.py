@@ -7,6 +7,7 @@ log = logging.getLogger('default')
 
 class board:
 
+
     ##################################################################################################################################################
     #
     # Initialization functions
@@ -16,14 +17,18 @@ class board:
 
 
     def __init__(self, n_players):
-        self.table = {}
+        self.table = {} #key is position, and stores player object
+        self.deck = LTK_deck.Deck()
+
         self.assignPositionsandRoles(n_players)
         self.characterChoices()
-        self.deck = LTK_deck.Deck()
         self.deal()
+        
         self.playerturn = 0
         self.rounds = 0
         self.winner = None
+
+
 
 
 
@@ -35,13 +40,15 @@ class board:
         
         names = []
         for i in range(1, n_players + 1):
-            names += [input("Please input player {n}'s name:\n".format(n = i))]
+            names += [input("Please input player {n}'s name:\n".format(n = i))] #TODO: Make sure no duplicate names 
 
         for i in range(n_players):
             if i == 0:
                 self.table[i] = [names.pop(random.randrange(0,len(names))), "Monarch"]
             else:
                 self.table[i] = [names.pop(random.randrange(0,len(names))), roles.pop(random.randrange(0,len(roles)))]
+
+
 
         log.info("Assigned positions and rolls")
             
@@ -54,12 +61,14 @@ class board:
             # for others, don't put choices back in pool
             # everything except Monarch should be simultaneous....  but for now..... a loop will do 
             # initialize players from LTK_player based on character selection - for now generic player
-            self.table[i] = LTK_player.Player(self.table[i][0], self.table[i][1])
+            self.table[i] = LTK_player.Player(self.table[i][0], self.table[i][1], i, self.deck, self)
+
+
 
 
     def deal(self):
         for p in self.table.values():
-            p.draw(self.deck, 4)
+            p.draw(4)
 
 
     ##################################################################################################################################################
@@ -75,12 +84,19 @@ class board:
         
         while not self.winner: 
 
+            log.info("Round: {rounds}".format(rounds = self.rounds))
+            log.info("Player Turn: {name}".format(name = self.table[self.playerturn]))
+            for i in self.table:
+                log.info("Player {name} currently has {health} health".format(name = self.table[i].name, health = self.table[i].health))
+
+
             if self.playerturn == 0:
                 self.rounds += 1 #everytime it's the monarch's turn, it counts as a new round 
 
             self.turn(self.playerturn) 
 
             self.playerturn = (self.playerturn + 1) % len(self.table) # just an update for who goes next 
+
 
             if self.rounds > 5:  #safety for now, remove later
                 log.info("Reached over 5 rounds, we're quitting the game") 
@@ -93,11 +109,11 @@ class board:
     def turn(self, playerposition):
         player = self.table[playerposition]
 
-        player.beforeplayphase(self.deck)
+        player.beforeplayphase()
 
         skipPlay = False
         while True: 
-            output = player.judgmentphase(self.deck) #does nothing for now since no judgements in the deck yet, but it's coded
+            output = player.judgmentphase() #does nothing for now since no judgements in the deck yet, but it's coded
             if output["Type"] == "Lightning":
                 if output["Result"] == -1:
                     self.checkDeath(playerposition, playerposition)
@@ -108,32 +124,24 @@ class board:
             else:
                 break
 
-        player.drawphase(self.deck)
+        player.drawphase()
 
         while not skipPlay: 
-            output = player.actionphase(self.deck) #action phase returns False for now so doesn't do anything
+            output = player.actionphase() #action phase returns False for now so doesn't do anything
             if output == False:
                 break
-            else:
+            elif output == True: #Player functions take care of it 
+                pass
+            else: 
                 pass
                 # TODO: Resolve play based on card, target.  If equipment or lightning, just report it 
 
 
-        player.discardphase(self.deck)
-        player.afterplayphase(self.deck)
+        player.discardphase()
+        player.afterplayphase()
 
 
 
-
-    # def checkDistance(self, attacker, defender, card):
-
-    #     #distance = min(abs(attacker position - defender postion), abs((attacker potion + len(self.table)) - defender position), abs(attacker position - (defender position + len(self.table))))
-    #     #modify by horses
-    #     if card == "Strike":
-    #         # modify by weapons
-    #         pass
-
-    #     return distance
 
 
 
@@ -169,7 +177,7 @@ class board:
             return False
         else:
             peachorder = [i if i < len(self.table) else i % len(self.table) for i in range(damagesourceposition, damagesourceposition + len(self.table))]
-            for i in peachorder:
+            for i in peachorder: #TODO: instead call askforpeaches
                 wanttogivepeaches = True
                 while wanttogivepeaches & player.health < 1:
                     #ask player i for peaches
@@ -183,25 +191,35 @@ class board:
                     return False
                 
             # because of the return False above, if it gets here, the player is dead
-            player.loseEverything(self.deck)
+            player.loseEverything()
             if damagesourceposition != self.playerturn:
                 if player.role == "Rebel":
                     self.table[damagesourceposition].draw(3)
                 if player.role == "Minister" and self.table[damagesourceposition].role == "Monarch":
-                    self.table[0].loseEverything(self.deck)
+                    self.table[0].loseEverything()
                     
+            player.position = -1
             for i in range(playerposition, len(self.table) - 1):
                 self.table[i] = self.table[i + 1]
             del(self.table[len(self.table) - 1]) #do we want some record of who's dead?  This doesn't seem the best method but it's a good temporary solution for making the game work
             if playerposition < self.playerturn:
                 self.playerturn -= 1
-            
+
+            for key, val in self.table.items():
+                val.position = key
+
             self.isGameOver()
 
 
 
 
+    def askforpeaches(self):
+        #TODO: create and call a function from player class - allows for flexibility with abilities
+        pass
 
+    def askforwards(self):
+        #TODO: create and call a function from player class
+        pass
 
 
 
@@ -213,13 +231,7 @@ class board:
     # #
     # ##################################################################################################################################################
 
-    # def Strike(self, attacker, defender):
-    #     checkDistance(attacker, defender, "Strike")
-    #     #check armor of defender
-    #     #ask defender to play dodge or take hit
-    #     #if struck, do defender.damage(n)
-    #     pass
-    
+
     # ####### Scrolls
 
     # def Dismantle(self, attacker, defender):
