@@ -102,7 +102,7 @@ class board:
             self.playerturn = (self.playerturn + 1) % len(self.table) # just an update for who goes next 
 
 
-            if self.rounds > 5:  #safety for now, remove later
+            if self.rounds > 20:  #safety for now, remove later
                 log.info("Reached over 5 rounds, we're quitting the game") 
                 self.winner = "No one"
 
@@ -140,15 +140,16 @@ class board:
         stillMonarch = False
         stillRebel = False
         stillTurncoat = False
-        for i in self.table:
-            if stillMonarch and (stillRebel or stillTurncoat):
-                return False
+        for i in self.table.values():
             if i.role == "Monarch":
                 stillMonarch = True
             if i.role == "Rebel":
                 stillRebel = True
             if i.role == "Turncoat":
                 stillTurncoat = True
+            if stillMonarch and (stillRebel or stillTurncoat):
+                return False
+
         if stillMonarch:
             self.winner = "Team Monarch"
         elif stillRebel:

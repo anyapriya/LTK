@@ -34,14 +34,11 @@ class Player:
 
 
     def draw(self, n):
-        log.info("Player drawing cards")
-        log.debug(self.hand)
         drawncards = self.deck.draw(n)
-        log.info("Player drew cards:")
+        log.info("Player {name} drew cards:".format(name = self.name))
         log.info(drawncards)
         self.hand += drawncards
         log.debug(self.hand)
-        log.info("Player finished drawing cards")
 
 
     #TODO: make tests!
@@ -172,12 +169,11 @@ class Player:
         #Joe's idea - if no one has any, this will run super fast and give away that no one has any - choose a random small amount of time, if it ran faster than that, then have it sleep difference 
         peachOrder = [i if i < len(self.board.table) else i % len(self.board.table) for i in range(damagesourceposition, damagesourceposition + len(self.board.table))] #TODO: this should be from damage source, it's from dying person's right now
         for i in peachOrder:
-            wanttogivepeaches = True
-            while wanttogivepeaches & self.health < 1:
+            while self.health < 1:
                 if self.board.table[i].peachsomeonedying():
                     self.health += 1
                 else: 
-                    wanttogivepeaches = False
+                    break
             if self.health > 0:
                 return False
         
@@ -200,7 +196,6 @@ class Player:
         # TODO: add to it based on equipment, for now no equipment
 
         possibletargets = []
-        print(self.board.table)
         for key,val in self.board.table.items():
             pass
             # TODO: check other people's range/equipement and see if they can be reached, what damage should be 
