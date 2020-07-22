@@ -14,7 +14,7 @@ class Player:
         self.name = name
         self.hand = []
         self.equipment = {"Off_horse": None, "Def_horse": None, "Armor": None, "Weapon": None}
-        self.judgement = []
+        self.judgementpile = []
         self.role = role
         self.maxhealth = 4
         self.health = 4
@@ -32,7 +32,7 @@ class Player:
     ##################################################################################################################################################
 
 
-    #TODO: make tests!
+
     def draw(self, n):
         log.info("Player drawing cards")
         log.debug(self.hand)
@@ -51,7 +51,8 @@ class Player:
         return judgement
 
 
-    #cards should be a list if discarding specific card(s), else use count to specify how many and ask the player which to discard - TODO: probably should be 2 different functions
+    # cards should be a list if discarding specific card(s), else use count to specify how many and ask the player which to discard
+    # TODO: probably should be 2 different functions
     def discard(self, cards = None, count = 1):
         if cards == None: 
             log.debug(self.hand)
@@ -95,8 +96,69 @@ class Player:
                 self.deck.discard(val)
                 self.equipment[key] = None
 
+
     #TODO: make tests!
-    def strike(self):
+    def dodge(self, damage, source):
+        #TODO: have player decide if they want to play a dodge and which dodge
+        for i in self.hand:
+            if LTK_deck.cards[i]["Type"] == "Dodge":
+                self.discard([i])
+                log.info("Dodged")
+                return True
+
+        self.damaged(damage)
+        self.board.checkDeath(self.position, source)
+        return False
+
+
+    def wardSomething(self):
+        #TODO: If player has a ward in hand, ask if they want to ward a card, if yes, discard ward and check for more wards, if ward goes through then return True, otherwise return False
+        return False
+
+    def askForWards(self):
+        #Joe's idea - if no one has any, this will run super fast and give away that no one has any - choose a random small amount of time, if it ran faster than that, then have it sleep difference 
+        wardOrder = [i if i < len(self.board.table) else i % len(self.board.table) for i in range(self.position + 1, self.position + len(self.board.table))]
+        for i in wardOrder:
+            if self.board.table[i].wardSomething():
+                return True #warded
+
+        return False #not warded
+
+
+    def peachsomeonedying(self):
+        #TODO: If player has a peach in hand, ask if they want to peach the person dying, if yes, discard peach and return True, otherwise return False
+        return False
+
+
+    def askForPeaches(self):
+        #Joe's idea - if no one has any, this will run super fast and give away that no one has any - choose a random small amount of time, if it ran faster than that, then have it sleep difference 
+        peachOrder = [i if i < len(self.board.table) else i % len(self.board.table) for i in range(self.position, self.position + len(self.board.table))]
+        for i in peachOrder:
+            wanttogivepeaches = True
+            while wanttogivepeaches & self.health < 1:
+                if self.board.table[i].peachsomeonedying():
+                    self.health += 1
+                else: 
+                    wanttogivepeaches = False
+            if self.health > 0:
+                return False
+        
+
+
+
+
+
+    ##################################################################################################################################################
+    #
+    # On turn actions
+    #
+    ##################################################################################################################################################
+
+    ####### Basic cards
+
+
+    #TODO: make tests!
+    def Strike(self):
         reach = 1
         # TODO: add to it based on equipment, for now no equipment
 
@@ -117,19 +179,58 @@ class Player:
         self.board.table[target].dodge(1, self.position)
         return True
 
+    ####### Delayed Scrolls
 
-    #TODO: make tests!
-    def dodge(self, damage, source):
-        #TODO: have player decide if they want to play a dodge and which dodge
-        for i in self.hand:
-            if LTK_deck.cards[i]["Type"] == "Dodge":
-                self.discard([i])
-                log.info("Dodged")
-                return True
+    def Contentment(self):
+        #Ask who it's targeting
+        pass
 
-        self.damaged(damage)
-        self.board.checkDeath(self.position, source)
-        return False
+
+
+    ####### Scrolls
+
+    def Dismantle(self): #TODO
+        #Ask who it's targeting
+        if not self.askForWards(): 
+            return True
+        else:
+            return True
+
+    def BorrowedSword(self): #TODO
+        #Ask who it's targeting (make sure someone with a weapon) and who they can target (someone in range) - if unplayable return False
+        if not self.askForWards(): 
+            return True
+        else:
+            return True #playable, just warded
+
+    def Snatch(self): #TODO
+        #Ask who it's targeting (make sure in range) - if unplayable return False
+        if not self.askForWards(): 
+            return True
+        else:
+            return True #playable, just warded
+
+    def Duel(self): #TODO
+        #Ask who it's targeting
+        if not self.askForWards(): 
+            return True
+        else:
+            return True 
+
+    ######## AOE Scrolls
+
+    def Barbarians(self, attacker): #TODO
+        pass
+
+    def ArrowBarrage(self, attacker): #TODO
+        pass
+
+    def PeachGarden(self, attacker): #TODO
+        pass
+
+    def BountifulHarvest(self, attacker): #TODO
+        pass
+
 
 
     ##################################################################################################################################################
@@ -146,22 +247,34 @@ class Player:
     #TODO: make tests!
     def judgmentphase(self):
         outcomes = {"Type": None, "Result": None} 
-        if len(self.judgement) == 0:
+        if len(self.judgementpile) == 0:
             pass
         else:
-            outcomes["Type"] = LTK_deck.cards[self.judgement[-1]]["Type"]
-            judgementcard = self.judgementdraw()
-            if outcomes["Type"] == "Lightning": #Last in, first out
-                if LTK_deck.cards[judgementcard]["Suit"] == "Spades" and (LTK_deck.cards[judgementcard]["Value"] >= 2 or LTK_deck.cards[judgementcard]["Value"] <= 9):
-                    self.deck.discard(self.judgement.pop(-1))
-                    self.damaged(3)
-                    outcomes["Result"] = -1
+            outcomes["Type"] = LTK_deck.cards[self.judgementpile[-1]]["Type"]
+
+            if self.askForWards():
+                judgementcard = None
+            else:
+                judgementcard = LTK_deck.cards[self.judgementdraw()]
+
+            #Last in, first out
+
+            if outcomes["Type"] == "Lightning": 
+                if judgementcard is None or (judgementcard["Suit"] != "Spades" or judgementcard["Value"] < 2 or judgementcard["Value"] > 9):
+                    outcomes["Result"] = 0
+                    self.board.table[(self.board.playerturn + 1) % len(self.board.table)].judgementpile.append(self.judgementpile.pop(-1)) #Put the card in the next person's judgement pile
                 else:
-                    outcomes["Result"] = self.judgement.pop(-1)
+                    self.deck.discard(self.judgementpile.pop(-1))
+                    self.damaged(3)
+                    outcomes["Result"] = 1
+                    self.board.checkDeath(self.position, self.position)
 
             elif outcomes["Type"] == "Contentment":
-                if LTK_deck.cards[judgementcard["Suit"]] != "Hearts":
-                    outcomes["Result"] = -1
+                self.deck.discard(self.judgementpile.pop(-1))
+                if judgementcard is None or judgementcard["Suit"] == "Hearts":
+                    outcomes["Result"] = 0
+                else:
+                    outcomes["Result"] = 1
 
             else:
                 #TODO: raise issue, nothing else should be there right now 
@@ -195,8 +308,10 @@ class Player:
 
                 log.info("Player {name} chose to play {card}".format(name = self.name, card = cardType))
                 
+
+                #BASIC CARDS 
                 if cardType == "Dodge" or cardType == "Ward":
-                    # Can't play dodge or ward on turn, TODO: give warning to player
+                    # Can't play dodge or ward on turn, TODO: make sure they can't choose it 
                     return True
 
                 elif cardType == "Peach":
@@ -205,29 +320,70 @@ class Player:
                     return True
 
                 elif cardType == "Strike": 
-                    couldPlay = self.strike()
+                    couldPlay = self.Strike()
                     if couldPlay:
                         self.discard([self.hand[cardPlayed]]) 
                     return True 
 
-                # elif cardType == "SomethingForNothing":
-                #     self.draw(2)
-                #     self.discard([self.hand[cardPlayed]])
+
+                #DELAYED SCROLLS
+                elif cardType == "Lightning":
+                    self.judgementpile.append(cardPlayed)
+                    return True
+
+                elif cardType == "Contentment": #TODO
+                    return True
+
+
+                #REGULAR SCROLLS
+                elif cardType == "SomethingForNothing": 
+                    if not self.askForWards():
+                        self.draw(2)
+                    self.discard([self.hand[cardPlayed]])
+                    return True
+
+                elif cardType == "Snatch": #TODO
+                    couldPlay = self.Snatch()
+                    if couldPlay:
+                        self.discard([self.hand[cardPlayed]]) 
+                    return True
+
+                elif cardType == "BorrowedSword": #TODO
+                    couldPlay = self.BorrowedSword()
+                    if couldPlay:
+                        self.discard([self.hand[cardPlayed]]) 
+                    return True
+
+                elif cardType == "Dismantle": #TODO
+                    self.Dismantle()
+                    self.discard([self.hand[cardPlayed]]) 
+                    return True
+
+                elif cardType == "Duel": #TODO
+                    self.Duel()
+                    self.discard([self.hand[cardPlayed]]) 
+                    return True
+
+
+                #AOE SCROLLS
+                elif cardType == "BountifulHarvest": #TODO
+                    return True
+
+                elif cardType == "PeachGarden": #TODO
+                    return True
+
+                elif cardType == "ArrowBarrage": #TODO
+                    return True
+
+                elif cardType == "BarbarianInvasion": #TODO
+                    return True
+
+
+                #EQUIPMENT
+                # else: #TODO
+                #     # Add to equipment section: replace old equipment (do self.deck.discard(card)) and put new equipment there
                 #     return True
 
-                #Gotta do scrolls and equipment
-
-                # elif cardType == equipment:
-                #     # Add to equipment section: replace equipment (do self.discard(card)) and put new equipment there
-                #     return True
-                # elif cardType == "Lightning":
-                #     # Add to judgement section, remove from hand
-                #     return True
-
-                else:
-                    log.error("Nothing in ActionPhase defined for the following card definition:")
-                    log.error(LTK_deck.cards[self.hand[cardPlayed]])
-                    raise NoActionDefinedForCard
 
 
     #TODO: make tests!

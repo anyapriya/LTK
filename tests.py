@@ -25,10 +25,19 @@ class test_board(unittest.TestCase):
 
 class test_player(unittest.TestCase):
     def test_draw(self):
-        pass #TODO
+        deck = Deck()
+        player = Player("Azulon", "Monarch", 0, deck, None)
+        self.assertEqual(len(player.hand), 0)
+        player.draw(4)
+        self.assertEqual(len(player.hand), 4)
+        for i in player.hand:
+            self.assertNotIn(i, deck.deck)
+            self.assertNotIn(i, deck.discardpile)
+
 
     def test_judgementdraw(self):
         pass #TODO
+
 
     def test_discard(self):
         deck = Deck()
