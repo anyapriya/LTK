@@ -70,7 +70,6 @@ class Player:
         log.debug(self.hand)
 
 
-
     def damaged(self, n):
         self.health -= n
         return self.health
@@ -97,6 +96,45 @@ class Player:
                 self.equipment[key] = None
 
 
+    def checkDeath(self, damagesourceposition):
+
+        if self.health > 0:
+            return False
+        else:
+            self.askForPeaches(damagesourceposition)
+            if self.health > 0:
+                return False
+                
+            # because of the return False above, if it gets here, the player is dead
+            self.loseEverything()
+            if damagesourceposition != self.position:
+                if self.role == "Rebel":
+                    self.board.table[damagesourceposition].draw(3)
+                if self.role == "Minister" and self.board.table[damagesourceposition].role == "Monarch":
+                    self.board.table[0].loseEverything()
+                    
+            self.board.deadPlayers.append(self)
+            for i in range(self.position, len(self.board.table) - 1):
+                self.board.table[i] = self.board.table[i + 1]
+            del(self.board.table[len(self.board.table) - 1]) #do we want some record of who's dead?  This doesn't seem the best method but it's a good temporary solution for making the game work
+            if self.position < self.board.playerturn:
+                self.board.playerturn -= 1
+            
+            self.position = -1
+            for key, val in self.board.table.items():
+                val.position = key
+
+            self.board.isGameOver()
+
+
+
+    ##################################################################################################################################################
+    #
+    # Off turn Actions
+    #
+    ##################################################################################################################################################
+
+
     #TODO: make tests!
     def dodge(self, damage, source):
         #TODO: have player decide if they want to play a dodge and which dodge
@@ -107,7 +145,7 @@ class Player:
                 return True
 
         self.damaged(damage)
-        self.board.checkDeath(self.position, source)
+        self.checkDeath(source)
         return False
 
 
@@ -117,7 +155,7 @@ class Player:
 
     def askForWards(self):
         #Joe's idea - if no one has any, this will run super fast and give away that no one has any - choose a random small amount of time, if it ran faster than that, then have it sleep difference 
-        wardOrder = [i if i < len(self.board.table) else i % len(self.board.table) for i in range(self.position + 1, self.position + len(self.board.table))]
+        wardOrder = [i if i < len(self.board.table) else i % len(self.board.table) for i in range(self.position, self.position + len(self.board.table))]
         for i in wardOrder:
             if self.board.table[i].wardSomething():
                 return True #warded
@@ -130,9 +168,9 @@ class Player:
         return False
 
 
-    def askForPeaches(self):
+    def askForPeaches(self, damagesourceposition):
         #Joe's idea - if no one has any, this will run super fast and give away that no one has any - choose a random small amount of time, if it ran faster than that, then have it sleep difference 
-        peachOrder = [i if i < len(self.board.table) else i % len(self.board.table) for i in range(self.position, self.position + len(self.board.table))]
+        peachOrder = [i if i < len(self.board.table) else i % len(self.board.table) for i in range(damagesourceposition, damagesourceposition + len(self.board.table))] #TODO: this should be from damage source, it's from dying person's right now
         for i in peachOrder:
             wanttogivepeaches = True
             while wanttogivepeaches & self.health < 1:
@@ -143,7 +181,6 @@ class Player:
             if self.health > 0:
                 return False
         
-
 
 
 
@@ -179,6 +216,13 @@ class Player:
         self.board.table[target].dodge(1, self.position)
         return True
 
+    def Equipment(self, card):
+        # Have a dict that maps card id to equipment type
+        # if there's something in the equipment slot, so self.deck.discard it
+        # put the new equipment in the slot
+        pass
+
+
     ####### Delayed Scrolls
 
     def Contentment(self):
@@ -197,7 +241,7 @@ class Player:
             return True
 
     def BorrowedSword(self): #TODO
-        #Ask who it's targeting (make sure someone with a weapon) and who they can target (someone in range) - if unplayable return False
+        #Ask who it's targeting as a puppet (make sure someone with a weapon) and who they can target (someone in range) - if unplayable return False
         if not self.askForWards(): 
             return True
         else:
@@ -267,7 +311,7 @@ class Player:
                     self.deck.discard(self.judgementpile.pop(-1))
                     self.damaged(3)
                     outcomes["Result"] = 1
-                    self.board.checkDeath(self.position, self.position)
+                    self.checkDeath(self.position)
 
             elif outcomes["Type"] == "Contentment":
                 self.deck.discard(self.judgementpile.pop(-1))
@@ -314,6 +358,7 @@ class Player:
                     # Can't play dodge or ward on turn, TODO: make sure they can't choose it 
                     return True
 
+                #TODO: - instead call corresponding function that shares name with cardType?  Gets rid of all the if statements...  
                 elif cardType == "Peach":
                     self.heal(1)
                     self.discard([self.hand[cardPlayed]]) 
@@ -380,9 +425,10 @@ class Player:
 
 
                 #EQUIPMENT
-                # else: #TODO
-                #     # Add to equipment section: replace old equipment (do self.deck.discard(card)) and put new equipment there
-                #     return True
+                elif cardType == "Equipment": #TODO
+                    self.Equipment(cardPlayed)
+                    self.hand.remove(cardPlayed)
+                    return True
 
 
 

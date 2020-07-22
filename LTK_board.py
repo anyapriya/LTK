@@ -41,7 +41,10 @@ class board:
         
         names = []
         for i in range(1, n_players + 1):
-            names.append(input("Please input player {n}'s name:\n".format(n = i))) #TODO: Make sure no duplicate names 
+            inputname = input("Please input player {n}'s name:\n".format(n = i))
+            while inputname in names:
+                inputname = input("That name has already been chosen, please input another name for player {n}:\n".format(n = i))
+            names.append(inputname) 
 
         for i in range(n_players):
             if i == 0:
@@ -123,21 +126,13 @@ class board:
         player.drawphase()
 
         while not skipPlay: 
-            output = player.actionphase() #action phase returns False for now so doesn't do anything
-            if output == False:
+            output = player.actionphase() 
+            if output == False: #no more cards to play, or player decided to end turn
                 break
-            elif output == True: #Player functions take care of it 
-                pass
-            else: 
-                pass
-                # TODO: Resolve play based on card, target.  If equipment or lightning, just report it 
 
 
         player.discardphase()
         player.afterplayphase()
-
-
-
 
 
 
@@ -161,44 +156,6 @@ class board:
         else:
             self.winner = "The Lone Turncoat"
 
-        
-        
-
-
-    
-    def checkDeath(self, playerposition, damagesourceposition):
-        player = self.table[playerposition]
-
-        if player.health > 0:
-            return False
-        else:
-            player.askForPeaches()
-            if player.health > 0:
-                return False
-                
-            # because of the return False above, if it gets here, the player is dead
-            player.loseEverything()
-            if damagesourceposition != self.playerturn:
-                if player.role == "Rebel":
-                    self.table[damagesourceposition].draw(3)
-                if player.role == "Minister" and self.table[damagesourceposition].role == "Monarch":
-                    self.table[0].loseEverything()
-                    
-            player.position = -1
-            self.deadPlayers.append(player)
-            for i in range(playerposition, len(self.table) - 1):
-                self.table[i] = self.table[i + 1]
-            del(self.table[len(self.table) - 1]) #do we want some record of who's dead?  This doesn't seem the best method but it's a good temporary solution for making the game work
-            if playerposition < self.playerturn:
-                self.playerturn -= 1
-
-            for key, val in self.table.items():
-                val.position = key
-
-            self.isGameOver()
-
-
-
 
 
 
@@ -207,7 +164,7 @@ class board:
 
 
 #Monarch is always 1
-#Is this correct???
+#TODO: check if this role distribution is correct
 RoleDistribution = {4: {"Minister": 0, "Rebel": 2, "Turncoat": 1},
                     5: {"Minister": 1, "Rebel": 2, "Turncoat": 1}, 
                     6: {"Minister": 1, "Rebel": 3, "Turncoat": 1},

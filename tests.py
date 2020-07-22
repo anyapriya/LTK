@@ -20,10 +20,29 @@ class test_main(unittest.TestCase):
 
 
 class test_board(unittest.TestCase):
-    pass #TODO
+    def test_assignPositionsandRoles(self):
+        pass #TODO
+
+    def test_characterChoices(self):
+        pass #TODO
+
+    def test_deal(self):
+        pass #TODO
+
+    def test_play(self):
+        pass #TODO
+
+    def test_turn(self):
+        pass #TODO
+
+    def test_isGameOver(self):
+        pass #TODO
+
 
 
 class test_player(unittest.TestCase):
+
+    # Helper functions 
     def test_draw(self):
         deck = Deck()
         player = Player("Azulon", "Monarch", 0, deck, None)
@@ -109,11 +128,62 @@ class test_player(unittest.TestCase):
         self.assertEqual(player.hand, [])
         self.assertEqual(player.equipment, {"Off_horse": None, "Def_horse": None, "Armor": None, "Weapon": None})
 
-    def test_strike(self):
+    def test_checkDeath(self):
         pass #TODO
 
+
+    # Off turn actions
     def test_dodge(self):
         pass #TODO
+
+    def test_wardSomething(self):
+        pass #TODO
+
+    def test_askForWards(self):
+        pass #TODO
+
+    def test_peachsomeonedying(self):
+        pass #TODO
+
+    def test_askForPeaches(self):
+        pass #TODO
+
+
+    # On turn actions
+    def test_Strike(self):
+        pass #TODO
+
+    def test_Equipment(self):
+        pass #TODO
+
+    def test_Contentment(self):
+        pass #TODO
+
+    def test_Dismantle(self):
+        pass #TODO
+
+    def test_BorrowedSword(self):
+        pass #TODO
+
+    def test_Snatch(self):
+        pass #TODO
+
+    def test_Duel(self):
+        pass #TODO
+
+    def test_Barbarians(self):
+        pass #TODO
+
+    def test_ArrowBarrage(self):
+        pass #TODO
+
+    def test_PeachGarden(self):
+        pass #TODO
+
+    def test_BountifulHarvest(self):
+        pass #TODO
+
+    # Turn phases
 
     def test_beforeplayphase(self):
         pass #TODO
@@ -132,7 +202,6 @@ class test_player(unittest.TestCase):
 
     def test_afterplayphase(self):
         pass #TODO
-
 
 
 
