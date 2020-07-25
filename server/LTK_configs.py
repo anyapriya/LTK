@@ -2,8 +2,11 @@ import logging
 import logging.handlers
 import logging.config
 import sys
+# from serversocket2 import send
 
-
+# class ClientHandler(logging.Handler):
+#     def emit(self, message):
+#         send(message)
 
 
 logging_config = { 
@@ -32,6 +35,17 @@ logging_config = {
             'interval': 1,
             'backupCount': 5
         },
+        # 'client': { 
+        #     'level': 'DEBUG',
+        #     'formatter': 'standard',
+        #     'class': 'logging.handlers.QueueHandler',
+        #     'queue': message_queue
+        # },
+        # 'print': { 
+        #     'level': 'DEBUG',
+        #     'formatter': 'standard',
+        #     'class': ClientHandler, 
+        # },
     },
 
 

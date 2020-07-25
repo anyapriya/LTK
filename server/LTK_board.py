@@ -39,12 +39,13 @@ class board:
         for key,val in RoleDistribution[n_players].items():
             roles.extend([key]*val)
         
-        names = []
-        for i in range(1, n_players + 1):
-            inputname = input("Please input player {n}'s name:\n".format(n = i))
-            while inputname in names:
-                inputname = input("That name has already been chosen, please input another name for player {n}:\n".format(n = i))
-            names.append(inputname) 
+        names = ["a", "b", "c", "d"]
+        # names = []
+        # for i in range(1, n_players + 1):
+        #     inputname = input("Please input player {n}'s name:\n".format(n = i))
+        #     while inputname in names:
+        #         inputname = input("That name has already been chosen, please input another name for player {n}:\n".format(n = i))
+        #     names.append(inputname) 
 
         for i in range(n_players):
             if i == 0:

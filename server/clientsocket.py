@@ -6,6 +6,7 @@ port = 8000
 s = socket.socket()
 s.connect((host,port))
 
-print(s.recv(1024))
+while True:
+  print(s.recv(1024))
 
 s.close()
