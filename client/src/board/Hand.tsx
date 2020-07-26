@@ -1,28 +1,20 @@
-import * as React from 'react';
+import React, { FunctionComponent } from 'react';
 
-interface State {
+interface Props {
   cards: string[];
 }
 
-const initialState: State = {
-  cards: ['Strike', 'Strike', 'Dodge', 'Peach', 'Dismantle']
-}
+const Hand: FunctionComponent<Props> = props => (
+  <React.Fragment>
+    <div>Hand</div>
+    <ul>
+      {props.cards.map((card, index) => (
+        <li key={index}>
+          {card}
+        </li>
+      ))}
+    </ul>
+  </React.Fragment>
+);
 
-export default class Hand extends React.Component<{}, State> {
-  state: State = initialState;
-
-  render() {
-    return (
-      <React.Fragment>
-        <div>Hand</div>
-        <ul>
-          {this.state.cards.map((card, index) => (
-            <li key={index}>
-              {card}
-            </li>
-          ))}
-        </ul>
-      </React.Fragment>
-    )
-  }
-}
+export default Hand;

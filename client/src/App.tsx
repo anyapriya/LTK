@@ -1,31 +1,56 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Hand from './board/Hand';
-import { w3cwebsocket as W3CWebSocket } from 'websocket';
+import openSocket from 'socket.io-client';
 
-const client = new W3CWebSocket('ws://127.0.0.1:8000');
+const socket = openSocket('http://localhost:5000'); // Works for now since we're on the same network
 
-class App extends Component {
+interface State {
+  cards: string[];
+}
 
-  componentWillMount() {
-    client.onopen = () => {
+export default class App extends Component<{}, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      cards: []
+    }
+
+    this.componentDidMount = this.componentDidMount.bind(this);
+  }
+  
+  componentDidMount() {
+    socket.on('connect', () => {
       console.log('Websocket connected');
-    }
+    });
 
-    client.onmessage = (message) => {
+    socket.on('message', (message: string) => {
       console.log(message);
-    }
+    });
+
+    socket.on('gamestate', (data: string[]) => {
+      console.log(data);
+      this.setState({
+        cards: data
+      });
+    });
+  }
+
+  shuffleHand() {
+    socket.emit('shuffle_hand');
   }
 
   render() {
+    const nCards = this.state.cards.length;
     return (
       <div className="App">
-        <button onClick={() => client.send("Testing")}>Send Message</button>
-        <Hand/>
+        {nCards > 0 &&
+          <div className="Player">
+            <button onClick={() => this.shuffleHand()}>Shuffle Hand</button>
+            <Hand cards={this.state.cards}/>
+          </div>
+        }
       </div>
     );
   }
 }
-
-export default App;
