@@ -20,6 +20,7 @@ class Player:
         self.health = 4
         self.deck = deck
         self.board = board
+        self.strikePlayed = False
         if self.role == "Monarch":
             self.health += 1
             self.maxhealth += 1
@@ -188,10 +189,19 @@ class Player:
     ##################################################################################################################################################
 
     ####### Basic cards
+    def onturn_Peach(self, card):
+        if self.health < self.maxhealth:
+            self.heal(1)
+            self.discard([card])
+            return True
+        else:
+            return False
 
+    def onturn_Dodge(self, card):
+        return False
 
     #TODO: make tests!
-    def Strike(self):
+    def onturn_Strike(self, card):
         reach = 1
         # TODO: add to it based on equipment, for now no equipment
 
@@ -200,18 +210,21 @@ class Player:
             pass
             # TODO: check other people's range/equipement and see if they can be reached, what damage should be 
 
-        # TODO: They can't play a strike
-        # if len(possibletargets) == 0: 
-        #     return False 
+        if len(possibletargets) == 0:
+            #return False
+            pass #TODO: uncomment after do proper checks of who it can reach
 
         # TODO: Choose who striking from possible targets, for now just next player
+        self.discard([card])
         target = (self.position + 1) % len(self.board.table)
 
         log.info("Player {offense} struck {defense}".format(offense = self.name, defense = self.board.table[target].name))
         self.board.table[target].dodge(1, self.position)
         return True
 
-    def Equipment(self, card):
+
+    def onturn_Equipment(self, card):
+        #TODO
         # Have a dict that maps card id to equipment type
         # if there's something in the equipment slot, so self.deck.discard it
         # put the new equipment in the slot
@@ -220,54 +233,84 @@ class Player:
 
     ####### Delayed Scrolls
 
-    def Contentment(self):
+    def onturn_Contentment(self, card):
+        #TODO
         #Ask who it's targeting
         pass
 
+    def onturn_Lightning(self, card):
+        self.hand.remove(card)
+        self.judgementpile.append(card)
+        return True
 
 
     ####### Scrolls
 
-    def Dismantle(self): #TODO
-        #Ask who it's targeting
-        if not self.askForWards(): 
+    def onturn_Ward(self, card):
+        return False
+
+    def onturn_SomethingForNothing(self, card):
+        if not self.askForWards():
+            self.draw(2)
+            self.discard([card])
             return True
         else:
+            self.discard([card])
             return True
 
-    def BorrowedSword(self): #TODO
+
+    def onturn_Dismantle(self, card): #TODO
+        #Ask who it's targeting
+        if not self.askForWards(): 
+            #TODO
+            self.discard([card])
+            return True
+        else:
+            self.discard([card])
+            return True 
+
+    def onturn_BorrowedSword(self, card): #TODO
         #Ask who it's targeting as a puppet (make sure someone with a weapon) and who they can target (someone in range) - if unplayable return False
         if not self.askForWards(): 
-            return True
+            #TODO
+            self.discard([card])
+            return True 
         else:
-            return True #playable, just warded
+            self.discard([card])
+            return True 
 
-    def Snatch(self): #TODO
+    def onturn_Snatch(self, card): #TODO
         #Ask who it's targeting (make sure in range) - if unplayable return False
         if not self.askForWards(): 
-            return True
+            #TODO
+            self.discard([card])
+            return True 
         else:
-            return True #playable, just warded
+            self.discard([card])
+            return True 
 
-    def Duel(self): #TODO
+    def onturn_Duel(self, card): #TODO
         #Ask who it's targeting
         if not self.askForWards(): 
+            #TODO
+            self.discard([card])
             return True
         else:
-            return True 
+            self.discard([card])
+            return True
 
     ######## AOE Scrolls
 
-    def Barbarians(self, attacker): #TODO
+    def onturn_Barbarians(self, card): #TODO
         pass
 
-    def ArrowBarrage(self, attacker): #TODO
+    def onturn_ArrowBarrage(self, card): #TODO
         pass
 
-    def PeachGarden(self, attacker): #TODO
+    def onturn_PeachGarden(self, card): #TODO
         pass
 
-    def BountifulHarvest(self, attacker): #TODO
+    def onturn_BountifulHarvest(self, card): #TODO
         pass
 
 
@@ -277,6 +320,32 @@ class Player:
     # Turn Phases
     #
     ##################################################################################################################################################
+
+    def turn(self):
+        self.beforeplayphase()
+
+        skipPlay = False
+        while True: 
+            output = self.judgmentphase() 
+            if output["Type"] is None:
+                break
+            elif output["Type"] == "Contentment" and output["Result"] == -1:
+                skipPlay = True
+
+        self.drawphase()
+
+        self.strikePlayed = False
+        while not skipPlay: 
+            output = self.actionphase() 
+            if output == False: #no more cards to play, or player decided to end turn
+                break
+
+
+        self.discardphase()
+        self.afterplayphase()
+
+
+
 
     #TODO: make tests!
     def beforeplayphase(self):
@@ -337,93 +406,20 @@ class Player:
             
         else:
             #TODO: Ask player which card they want to play or if they're done 
-            cardPlayed = random.randint(-1, len(self.hand) - 1)
+            cardPosition = random.randint(-1, len(self.hand) - 1)
 
-            if cardPlayed == -1:
+            if cardPosition == -1:
                 log.info("Player {name} chose to end turn".format(name = self.name))
                 return False #Done playing cards
             else:
-                cardType = LTK_deck.cards[self.hand[cardPlayed]]["Type"]
+                cardNum = self.hand[cardPosition]
+                cardType = LTK_deck.cards[cardNum]["Type"]
 
                 log.info("Player {name} chose to play {card}".format(name = self.name, card = cardType))
                 
+                getattr(self,'onturn_' + cardType)(cardNum) #calls the coresponding onturn function
 
-                #BASIC CARDS 
-                if cardType == "Dodge" or cardType == "Ward":
-                    # Can't play dodge or ward on turn, TODO: make sure they can't choose it 
-                    return True
-
-                #TODO: - instead call corresponding function that shares name with cardType?  Gets rid of all the if statements...  
-                elif cardType == "Peach":
-                    self.heal(1)
-                    self.discard([self.hand[cardPlayed]]) 
-                    return True
-
-                elif cardType == "Strike": 
-                    couldPlay = self.Strike()
-                    if couldPlay:
-                        self.discard([self.hand[cardPlayed]]) 
-                    return True 
-
-
-                #DELAYED SCROLLS
-                elif cardType == "Lightning":
-                    self.judgementpile.append(cardPlayed)
-                    return True
-
-                elif cardType == "Contentment": #TODO
-                    return True
-
-
-                #REGULAR SCROLLS
-                elif cardType == "SomethingForNothing": 
-                    if not self.askForWards():
-                        self.draw(2)
-                    self.discard([self.hand[cardPlayed]])
-                    return True
-
-                elif cardType == "Snatch": #TODO
-                    couldPlay = self.Snatch()
-                    if couldPlay:
-                        self.discard([self.hand[cardPlayed]]) 
-                    return True
-
-                elif cardType == "BorrowedSword": #TODO
-                    couldPlay = self.BorrowedSword()
-                    if couldPlay:
-                        self.discard([self.hand[cardPlayed]]) 
-                    return True
-
-                elif cardType == "Dismantle": #TODO
-                    self.Dismantle()
-                    self.discard([self.hand[cardPlayed]]) 
-                    return True
-
-                elif cardType == "Duel": #TODO
-                    self.Duel()
-                    self.discard([self.hand[cardPlayed]]) 
-                    return True
-
-
-                #AOE SCROLLS
-                elif cardType == "BountifulHarvest": #TODO
-                    return True
-
-                elif cardType == "PeachGarden": #TODO
-                    return True
-
-                elif cardType == "ArrowBarrage": #TODO
-                    return True
-
-                elif cardType == "BarbarianInvasion": #TODO
-                    return True
-
-
-                #EQUIPMENT
-                elif cardType == "Equipment": #TODO
-                    self.Equipment(cardPlayed)
-                    self.hand.remove(cardPlayed)
-                    return True
+                return True
 
 
 
