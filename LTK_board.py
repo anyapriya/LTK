@@ -89,7 +89,7 @@ class board:
         while not self.winner: 
 
             log.info("Round: {rounds}".format(rounds = self.rounds))
-            log.info("Player Turn: {name}".format(name = self.table[self.playerturn]))
+            log.info("Player Turn: {name}".format(name = self.table[self.playerturn].name))
             for i in self.table:
                 log.info("Player {name} currently has {health} health".format(name = self.table[i].name, health = self.table[i].health))
 
@@ -97,7 +97,7 @@ class board:
             if self.playerturn == 0:
                 self.rounds += 1 #everytime it's the monarch's turn, it counts as a new round 
 
-            self.turn(self.playerturn) 
+            self.table[self.playerturn].turn()
 
             self.playerturn = (self.playerturn + 1) % len(self.table) # just an update for who goes next 
 
@@ -109,30 +109,6 @@ class board:
         log.info("The winner was: " + self.winner)
 
 
-
-    def turn(self, playerposition):
-        player = self.table[playerposition]
-
-        player.beforeplayphase()
-
-        skipPlay = False
-        while True: 
-            output = player.judgmentphase() 
-            if output["Type"] is None:
-                break
-            elif output["Type"] == "Contentment" and output["Result"] == -1:
-                skipPlay = True
-
-        player.drawphase()
-
-        while not skipPlay: 
-            output = player.actionphase() 
-            if output == False: #no more cards to play, or player decided to end turn
-                break
-
-
-        player.discardphase()
-        player.afterplayphase()
 
 
 
