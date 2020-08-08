@@ -1,32 +1,34 @@
-import { Player } from "./board/Player";
+import { Target } from "./target";
+import { Player } from "./board/player";
 
-export interface GameState {
+export interface Gamestate {
   players: Player[];
-  activeActions: Action[];
-  possibleActions: Action[];
   activePlayerId: number;
-  // gameOver and who won
-  currentTurn: number;
+  turnPlayerId: number;
   currentPhase: Phase;
+  activeActions: ActiveAction[];
+  possibleActions: Action[];
 }
 
-export interface HandCard {
-  actions: Action[];
+export interface ActiveAction extends Action {
+  target?: Target;
+  id: number;
 }
 
-export interface HeroAbility {
-  actions: Action[];
+export interface CardAction extends Action {
+  type: ActionType.CARD;
+  cardId: number;
 }
 
 export interface Action {
-  legal: boolean;
-  targets: Target[];
+  type: ActionType;
+  hasTargets: boolean; // If an action targets something, the client will ask the server for possible targets
 }
 
-export interface Target {
-  playerId: number;
-  id: number;
-  // ???
+export enum ActionType {
+  CARD,
+  END_TURN,
+  PASS
 }
 
 export enum Phase {
