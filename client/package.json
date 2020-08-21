@@ -23,7 +23,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "prettier --write \"src/**/*.{ts,tsx,scss,html}\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -41,6 +42,7 @@
     ]
   },
   "devDependencies": {
-    "@types/socket.io-client": "^1.4.33"
+    "@types/socket.io-client": "^1.4.33",
+    "prettier": "^2.0.5"
   }
 }

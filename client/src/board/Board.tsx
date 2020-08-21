@@ -13,19 +13,20 @@ interface Props {
   performAction: (action: CardAction, target?: Target) => void;
 }
 
-const Board: FunctionComponent<Props> = props => (
+const Board: FunctionComponent<Props> = (props) => (
   <React.Fragment>
-    {
-      props.players.map((player, index) => {
-        return <PlayerDisplay
+    {props.players.map((player, index) => {
+      return (
+        <PlayerDisplay
           key={index}
           player={player}
           isMe={index === props.myPlayerId}
           cardActions={props.cardActions}
           getTargets={props.getTargets}
-          performAction={props.performAction}/>
-      })
-    }
+          performAction={props.performAction}
+        />
+      );
+    })}
   </React.Fragment>
 );
 

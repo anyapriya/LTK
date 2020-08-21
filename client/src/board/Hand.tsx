@@ -11,7 +11,6 @@ interface Props {
 }
 
 export default class Hand extends Component<Props, {}> {
-
   // Could be nicer if this was handled in App or Board to avoid passing it all the way up the chain (lift the state)
   private handleClick = async (cardId: number) => {
     if (!this.props.cardActions) {
@@ -20,15 +19,17 @@ export default class Hand extends Component<Props, {}> {
 
     // TODO: prevent the user from clicking a different card until the current click is resolved
 
-    const actions: CardAction[] = this.props.cardActions?.filter(a => a.cardId === cardId);
+    const actions: CardAction[] = this.props.cardActions?.filter(
+      (a) => a.cardId === cardId
+    );
 
     if (actions.length === 0) {
       return;
     }
-    
+
     // TODO: Prompt the user for which action they're activating (if applicable)
     const action: CardAction = actions[0];
-    
+
     // If the action has targets, get them from the server
     if (action.hasTargets) {
       this.props.getTargets(action).then(
@@ -43,34 +44,33 @@ export default class Hand extends Component<Props, {}> {
           // handle error?
           console.log(error);
         }
-      )
+      );
     } else {
       this.props.performAction(action);
     }
-
-  }
+  };
 
   render() {
     return (
       <React.Fragment>
         <div>Hand</div>
-        {this.props.cards.length > 0 &&
+        {this.props.cards.length > 0 && (
           <ul>
             {this.props.cards.map((card, index) => (
               <HandCard
                 key={index}
                 id={index}
                 cardName={CardType[card]}
-                onClick={() => this.handleClick(index)}/>
+                onClick={() => this.handleClick(index)}
+              />
             ))}
           </ul>
-        }
-        {this.props.cards.length === 0 && "No cards in hand"}
+        )}
+        {this.props.cards.length === 0 && 'No cards in hand'}
       </React.Fragment>
     );
   }
 }
-
 
 interface HandCardProps {
   id: number;
@@ -78,8 +78,8 @@ interface HandCardProps {
   onClick: any; // onClick should only exist if the card has a possible action
 }
 
-const HandCard: FunctionComponent<HandCardProps> = props => (
+const HandCard: FunctionComponent<HandCardProps> = (props) => (
   <li key={props.id} onClick={props.onClick}>
     {props.cardName}
   </li>
-)
+);

@@ -1,5 +1,5 @@
-import { Target } from "./target";
-import { Player } from "./board/player";
+import { Target } from './target';
+import { Player } from './board/player';
 
 export interface Gamestate {
   players: Player[];
@@ -29,7 +29,7 @@ export enum ActionType {
   CARD = 'CARD',
   END_TURN = 'END_TURN',
   PASS = 'PASS',
-  DEATHS_DOOR = 'DEATHS_DOOR'
+  DEATHS_DOOR = 'DEATHS_DOOR',
 }
 
 export enum Phase {
@@ -38,5 +38,5 @@ export enum Phase {
   DRAW = 'DRAW',
   PLAY = 'PLAY',
   DISCARD = 'DISCARD',
-  END_OF_TURN = 'END_OF_TURN'
+  END_OF_TURN = 'END_OF_TURN',
 }

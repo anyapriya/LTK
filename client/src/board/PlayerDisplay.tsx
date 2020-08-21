@@ -13,20 +13,21 @@ interface Props {
   performAction: (action: CardAction, target?: Target) => void;
 }
 
-const PlayerDisplay: FunctionComponent<Props> = props => (
-  <div className='playerDisplay'>
+const PlayerDisplay: FunctionComponent<Props> = (props) => (
+  <div className="playerDisplay">
     <header>{props.player.name}</header>
-    { props.isMe
-      ?
+    {props.isMe ? (
       <Hand
         cards={props.player.hand}
         cardActions={props.cardActions}
         getTargets={props.getTargets}
-        performAction={props.performAction}/>
-      : <p># of cards in hand: {props.player.hand.length}</p>
-    }
+        performAction={props.performAction}
+      />
+    ) : (
+      <p># of cards in hand: {props.player.hand.length}</p>
+    )}
     <p>Health: {props.player.currentHealth} / 4</p>
   </div>
-)
+);
 
 export default PlayerDisplay;

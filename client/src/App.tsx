@@ -18,29 +18,29 @@ const initialGamestate: Gamestate = {
   players: [
     {
       id: 0,
-      name: "P1",
+      name: 'P1',
       currentHealth: 3,
       hand: [CardType.STRIKE, CardType.STRIKE, CardType.PEACH, CardType.DODGE],
     },
     {
       id: 1,
-      name: "P2",
+      name: 'P2',
       currentHealth: 3,
-      hand: []
+      hand: [],
     },
     {
       id: 2,
-      name: "P3",
+      name: 'P3',
       currentHealth: 2,
-      hand: [CardType.DODGE, CardType.DODGE]
+      hand: [CardType.DODGE, CardType.DODGE],
     },
     {
       id: 3,
-      name: "P4",
+      name: 'P4',
       currentHealth: 0,
       hand: [],
-      dead: true
-    }
+      dead: true,
+    },
   ],
   activePlayerId: 0,
   turnPlayerId: 0,
@@ -50,36 +50,36 @@ const initialGamestate: Gamestate = {
     {
       type: ActionType.CARD,
       cardId: 0,
-      hasTargets: true
+      hasTargets: true,
     } as CardAction,
     {
       type: ActionType.CARD,
       cardId: 1,
-      hasTargets: true
+      hasTargets: true,
     } as CardAction,
     {
       type: ActionType.CARD,
       cardId: 2,
-      hasTargets: false
+      hasTargets: false,
     } as CardAction,
     {
       type: ActionType.END_TURN,
-      hasTargets: false
-    }
-  ]
-}
+      hasTargets: false,
+    },
+  ],
+};
 
 export default class App extends Component<{}, State> {
   constructor(props: any) {
     super(props);
-    this.state = { 
+    this.state = {
       gamestate: initialGamestate,
-      myPlayerId: 0 // TODO: Remove once we're actually connecting to the server
+      myPlayerId: 0, // TODO: Remove once we're actually connecting to the server
     };
 
     this.componentDidMount = this.componentDidMount.bind(this);
   }
-  
+
   componentDidMount() {
     socket.on('connect', () => {
       console.log('Websocket connected');
@@ -92,7 +92,7 @@ export default class App extends Component<{}, State> {
     socket.on('gamestate', (gamestate: Gamestate) => {
       console.log(gamestate);
       this.setState({
-        gamestate: gamestate
+        gamestate: gamestate,
       });
       // Might be easier to convert hands here to add in card action handleClick which can be moved up here
     });
@@ -101,54 +101,62 @@ export default class App extends Component<{}, State> {
   // Do we really need to send the full Action, or can we just send the index of the action?
   private getTargets = async (action: Action): Promise<Target[]> => {
     return new Promise((resolve: any) => {
-      socket.emit('getTargets', {action}, (response: any) => {
+      socket.emit('getTargets', { action }, (response: any) => {
         console.log(response);
         console.log(response.result);
         // TODO: handle error (response.error?)
         return resolve(response.result);
       });
     });
-  }
+  };
 
   private performAction = (action: Action, target?: Target) => {
     const body = {
       action,
-      ...(target !== undefined && {target})
+      ...(target !== undefined && { target }),
     };
     socket.emit('action', body);
-  }
+  };
 
   private passPriority = () => {
     this.performAction({
       type: ActionType.PASS,
-      hasTargets: false
+      hasTargets: false,
     });
-  }
+  };
 
   private endTurn = () => {
     this.performAction({
       type: ActionType.END_TURN,
-      hasTargets: false
+      hasTargets: false,
     });
-  }
+  };
 
   private changeMyPlayerId = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newId: number = Number(event.target.value);
     console.log(newId);
     this.setState({
-      myPlayerId: newId
+      myPlayerId: newId,
     });
-  }
+  };
 
   render() {
-    const cardActions: CardAction[] = 
-      this.state.gamestate.possibleActions
-        .filter(a => a.type === ActionType.CARD)
-        .map(a => a as CardAction);
-    
-    const playerHasPriority = this.state.myPlayerId === this.state.gamestate.activePlayerId;
-    const passButtonEnabled = playerHasPriority && this.state.gamestate.possibleActions.some((a:Action) => a.type === ActionType.PASS);
-    const endTurnButtonEnabled = playerHasPriority && this.state.gamestate.possibleActions.some((a:Action) => a.type === ActionType.END_TURN);
+    const cardActions: CardAction[] = this.state.gamestate.possibleActions
+      .filter((a) => a.type === ActionType.CARD)
+      .map((a) => a as CardAction);
+
+    const playerHasPriority =
+      this.state.myPlayerId === this.state.gamestate.activePlayerId;
+    const passButtonEnabled =
+      playerHasPriority &&
+      this.state.gamestate.possibleActions.some(
+        (a: Action) => a.type === ActionType.PASS
+      );
+    const endTurnButtonEnabled =
+      playerHasPriority &&
+      this.state.gamestate.possibleActions.some(
+        (a: Action) => a.type === ActionType.END_TURN
+      );
     return (
       <React.Fragment>
         <Board
@@ -156,7 +164,8 @@ export default class App extends Component<{}, State> {
           myPlayerId={this.state.myPlayerId}
           cardActions={cardActions}
           getTargets={this.getTargets}
-          performAction={this.performAction}/>
+          performAction={this.performAction}
+        />
         <label htmlFor="playerNumberInput">Player #</label>
         <input
           id="playerNumberInput"
@@ -165,23 +174,25 @@ export default class App extends Component<{}, State> {
           onChange={this.changeMyPlayerId}
           defaultValue={0}
         />
-        <br/>
-        {
-          this.state.myPlayerId === this.state.gamestate.activePlayerId
-          ? "You Have Priority"
-          : `Player ${this.state.gamestate.activePlayerId} has priority`
-        }
-        <br/>
-        {
-          this.state.myPlayerId === this.state.gamestate.turnPlayerId
-          ? "It is your turn"
-          : `It is Player ${this.state.gamestate.activePlayerId}'s turn`
-        }
-        <br/>
+        <br />
+        {this.state.myPlayerId === this.state.gamestate.activePlayerId
+          ? 'You Have Priority'
+          : `Player ${this.state.gamestate.activePlayerId} has priority`}
+        <br />
+        {this.state.myPlayerId === this.state.gamestate.turnPlayerId
+          ? 'It is your turn'
+          : `It is Player ${this.state.gamestate.activePlayerId}'s turn`}
+        <br />
         The current phase is {Phase[this.state.gamestate.currentPhase]}
-        <br/>
-        <button disabled={!passButtonEnabled} onClick={() => this.passPriority()}>PASS</button>
-        <button disabled={!endTurnButtonEnabled} onClick={() => this.endTurn()}>END TURN</button>
+        <br />
+        <button
+          disabled={!passButtonEnabled}
+          onClick={() => this.passPriority()}>
+          PASS
+        </button>
+        <button disabled={!endTurnButtonEnabled} onClick={() => this.endTurn()}>
+          END TURN
+        </button>
       </React.Fragment>
     );
   }

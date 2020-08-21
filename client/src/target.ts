@@ -14,5 +14,5 @@ export interface Target {
 
 export enum TargetType {
   PLAYER = 'PLAYER',
-  ACTIVE_ACTION = 'ACTIVE_ACTION'
+  ACTIVE_ACTION = 'ACTIVE_ACTION',
 }

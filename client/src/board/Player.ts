@@ -9,5 +9,5 @@ export interface Player {
 export enum CardType {
   STRIKE = 'STRIKE',
   DODGE = 'DODGE',
-  PEACH = 'PEACH'
+  PEACH = 'PEACH',
 }
