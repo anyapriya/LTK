@@ -7,7 +7,7 @@ export interface Player {
 }
 
 export enum CardType {
-  STRIKE,
-  DODGE,
-  PEACH
+  STRIKE = 'STRIKE',
+  DODGE = 'DODGE',
+  PEACH = 'PEACH'
 }

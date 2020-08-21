@@ -1,0 +1,49 @@
+{
+  "players": [
+    {
+      "id": 0,
+      "name": "P1",
+      "currentHealth": 3,
+      "hand": ["STRIKE", "PEACH", "DODGE", "STRIKE"]
+    },
+    {
+      "id": 1,
+      "name": "P2",
+      "currentHealth": 3,
+      "hand": []
+    },
+    {
+      "id": 2,
+      "currentHealth": 2,
+      "name": "P3",
+      "hand": ["DODGE", "DODGE"]
+    },
+    {
+      "id": 3,
+      "name": "P4",
+      "currentHealth": 0,
+      "hand": [],
+      "dead": true
+    }
+  ],
+  "activePlayerId": 0,
+  "turnPlayerId": 0,
+  "currentPhase": "PLAY",
+  "activeActions": [],
+  "possibleActions": [
+    {
+      "type": "CARD",
+      "cardId": 0,
+      "hasTargets": true
+    },
+    {
+      "type": "CARD",
+      "cardId": 3,
+      "hasTargets": true
+    },
+    {
+      "type": "END_TURN",
+      "hasTargets": false
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "result": [
+    {
+      "type": "PLAYER",
+      "id": 1
+    },
+    {
+      "type": "PLAYER",
+      "id": 2
+    },
+    {
+      "type": "PLAYER",
+      "id": 3
+    }
+  ]
+}

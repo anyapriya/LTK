@@ -18,7 +18,7 @@ export default class Hand extends Component<Props, {}> {
       return;
     }
 
-    // TODO: prevent the user from clicking a different card until this is resolved
+    // TODO: prevent the user from clicking a different card until the current click is resolved
 
     const actions: CardAction[] = this.props.cardActions?.filter(a => a.cardId === cardId);
 

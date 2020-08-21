@@ -13,6 +13,6 @@ export interface Target {
 }
 
 export enum TargetType {
-  PLAYER,
-  ACTIVE_ACTION
+  PLAYER = 'PLAYER',
+  ACTIVE_ACTION = 'ACTIVE_ACTION'
 }

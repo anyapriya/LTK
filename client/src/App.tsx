@@ -6,7 +6,8 @@ import { CardType } from './board/player';
 import Board from './board/Board';
 import { Target } from './target';
 
-const socket = openSocket('http://localhost:5000'); // Works for now since we're on the same network
+// TODO: extract into .env or similar
+const socket = openSocket('http://localhost:5000'); // localhost works for now since we're on the same network
 
 interface State {
   gamestate: Gamestate;
@@ -97,6 +98,7 @@ export default class App extends Component<{}, State> {
     });
   }
 
+  // Do we really need to send the full Action, or can we just send the index of the action?
   private getTargets = async (action: Action): Promise<Target[]> => {
     return new Promise((resolve: any) => {
       socket.emit('getTargets', {action}, (response: any) => {
