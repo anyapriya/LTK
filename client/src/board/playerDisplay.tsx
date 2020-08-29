@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { Player } from './player';
-import Hand from './Hand';
+import Hand from './hand';
 import './playerDisplay.scss';
-import { CardAction } from '../gamestate';
+import { CardAction } from '../gameState';
 import { Target } from '../target';
 
 interface Props {

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import './App.css';
+import './app.css';
 import openSocket from 'socket.io-client';
-import { Gamestate, Phase, ActionType, CardAction, Action } from './gamestate';
+import { Gamestate, Phase, ActionType, CardAction, Action } from './gameState';
 import { CardType } from './board/player';
-import Board from './board/Board';
+import Board from './board/board';
 import { Target } from './target';
 
 // TODO: extract into .env or similar

@@ -1,6 +1,6 @@
 import React, { FunctionComponent, Component } from 'react';
 import { CardType } from './player';
-import { CardAction } from '../gamestate';
+import { CardAction } from '../gameState';
 import { Target } from '../target';
 
 interface Props {
