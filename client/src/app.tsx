@@ -2,93 +2,26 @@ import React, { Component } from 'react';
 import './app.css';
 import openSocket from 'socket.io-client';
 import { Gamestate, Phase, ActionType, CardAction, Action } from './gameState';
-import { CardType } from './board/player';
 import Board from './board/board';
 import { Target } from './target';
+import { Connecting } from './connecting';
 
 // TODO: extract into .env or similar
 const socket = openSocket('http://localhost:5000'); // localhost works for now since we're on the same network
 
 interface State {
-  gamestate: Gamestate;
-  myPlayerId: number;
+  gamestate?: Gamestate;
+  myPlayerId?: number;
 }
-
-const initialGamestate: Gamestate = {
-  players: [
-    {
-      id: 0,
-      name: 'P1',
-      currentHealth: 3,
-      hand: [CardType.STRIKE, CardType.STRIKE, CardType.PEACH, CardType.DODGE],
-    },
-    {
-      id: 1,
-      name: 'P2',
-      currentHealth: 3,
-      hand: [],
-    },
-    {
-      id: 2,
-      name: 'P3',
-      currentHealth: 2,
-      hand: [CardType.DODGE, CardType.DODGE],
-    },
-    {
-      id: 3,
-      name: 'P4',
-      currentHealth: 0,
-      hand: [],
-      dead: true,
-    },
-  ],
-  activePlayerId: 0,
-  turnPlayerId: 0,
-  currentPhase: Phase.PLAY,
-  activeActions: [],
-  possibleActions: [
-    {
-      type: ActionType.CARD,
-      cardId: 0,
-      hasTargets: true,
-    } as CardAction,
-    {
-      type: ActionType.CARD,
-      cardId: 1,
-      hasTargets: true,
-    } as CardAction,
-    {
-      type: ActionType.CARD,
-      cardId: 2,
-      hasTargets: false,
-    } as CardAction,
-    {
-      type: ActionType.END_TURN,
-      hasTargets: false,
-    },
-  ],
-};
 
 export default class App extends Component<{}, State> {
   constructor(props: any) {
     super(props);
-    this.state = {
-      gamestate: initialGamestate,
-      myPlayerId: 0, // TODO: Remove once we're actually connecting to the server
-    };
-
+    this.state = {};
     this.componentDidMount = this.componentDidMount.bind(this);
   }
 
   componentDidMount() {
-    socket.on('connect', () => {
-      console.log('Websocket connected');
-    });
-
-    socket.on('message', (message: string) => {
-      console.log(message);
-    });
-
     socket.on('gamestate', (gamestate: Gamestate) => {
       console.log(gamestate);
       this.setState({
@@ -96,7 +29,15 @@ export default class App extends Component<{}, State> {
       });
       // Might be easier to convert hands here to add in card action handleClick which can be moved up here
     });
+
+    this.connect();
   }
+
+  private connect = (): void => {
+    socket.emit('connect', (playerId: number) => {
+      this.setState({ myPlayerId: playerId });
+    });
+  };
 
   // Do we really need to send the full Action, or can we just send the index of the action?
   private getTargets = async (action: Action): Promise<Target[]> => {
@@ -141,6 +82,13 @@ export default class App extends Component<{}, State> {
   };
 
   render() {
+    if (
+      this.state.gamestate === undefined ||
+      this.state.myPlayerId === undefined
+    ) {
+      return <Connecting myPlayerId={this.state.myPlayerId} />;
+    }
+
     const cardActions: CardAction[] = this.state.gamestate.possibleActions
       .filter((a) => a.type === ActionType.CARD)
       .map((a) => a as CardAction);

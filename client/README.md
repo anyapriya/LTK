@@ -20,6 +20,10 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.<br />
 You will also see any lint errors in the console.
 
+### `npm run prettier`
+
+This app uses Prettier as an opinionated formatter, so we don't have to worry about fixing any formatting problems. Running this script every time before committing helps cut down on unnecessary formatting changes.
+
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.<br />
